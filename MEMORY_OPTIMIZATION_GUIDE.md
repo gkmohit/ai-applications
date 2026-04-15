@@ -1,5 +1,57 @@
 # Google Colab Memory Optimization Guide
 
+## ⚠️ CRITICAL: GPU Was Not Being Used!
+
+### The Issue
+Your Colab has a GPU (23.5 GB VRAM available) but the notebook was only using **system RAM** (61GB).
+- **GPU VRAM**: 0.0 / 23.5 GB ← **COMPLETELY IDLE**
+- **System RAM**: 43.5 / 61 GB ← **OVERUSED**
+
+This is why you're crashing - transformers should run on GPU, not RAM.
+
+### The Root Cause
+PyTorch device was created (`torch.device('cuda')`) but:
+1. Models were never moved to GPU with `.to(device)`
+2. Data tensors were never moved to GPU
+3. Training loops didn't use `.to('cuda')` for batches
+4. GPU remained idle while RAM got maxed out
+
+### Immediate Fix
+**Three new cells have been added to force GPU usage:**
+
+#### Cell 1: GPU Memory Monitor
+Shows that GPU is available and reports real-time memory status
+
+#### Cell 2: GPU Helper Functions  
+Provides:
+- `move_model_to_gpu()`: Force models to GPU
+- `create_gpu_dataloader()`: Move entire datasets to GPU
+- `prepare_gpu_for_training()`: Cleanup before training
+
+#### Cell 3: PRE-EPOCH SETUP - GPU-Only Training
+**CRITICAL CODE PATTERN - Use this in ALL transformer training:**
+```python
+# ✓ CORRECT - Uses GPU
+for batch in train_loader:
+    # Move batch to GPU
+    batch = {k: v.to('cuda') for k, v in batch.items()}
+    
+    # Run model
+    outputs = model(**batch)
+    loss = outputs.loss
+    ...
+    
+    # Clean GPU cache after epoch
+    cleanup_gpu_after_epoch()
+
+# ✗ WRONG - Still uses RAM!
+for batch in train_loader:
+    outputs = model(**batch)  # Oops, batch is on CPU!
+    ...
+```
+
+---
+
 ## Problem: "Your session crashed after using all available RAM"
 
 This error occurs in Google Colab when:
@@ -171,6 +223,77 @@ process = psutil.Process()
 print(f"RAM used: {process.memory_info().rss / (1024**3):.2f} GB")
 ```
 
+## 🔴 GPU FORCING: Making Sure Transformers Use GPU
+
+### Why models crash even with GPU available:
+
+The notebook detects GPU but doesn't FORCE it into training. Add to EVERY transformer training loop:
+
+### Pattern 1: Using Hugging Face Transformers
+```python
+import torch
+from transformers import DistilBertForSequenceClassification
+
+# WRONG - Uses CPU RAM
+model = DistilBertForSequenceClassification.from_pretrained('distilbert-base-uncased')
+for batch in train_loader:
+    outputs = model(**batch)  # CRASH - batch on CPU!
+
+# CORRECT - Uses GPU
+device = torch.device('cuda')
+model = DistilBertForSequenceClassification.from_pretrained('distilbert-base-uncased')
+model = model.to(device)  # ← FORCE TO GPU!
+
+for batch in train_loader:
+    # Move batch to GPU
+    batch = {k: v.to(device) for k, v in batch.items()}
+    
+    outputs = model(**batch)
+    loss = outputs.loss
+    loss.backward()
+    optimizer.step()
+    
+    # Clean GPU cache
+    torch.cuda.empty_cache()
+```
+
+### Pattern 2: DataLoader with GPU-bound tensors
+```python
+import torch
+from torch.utils.data import DataLoader, TensorDataset
+
+device = torch.device('cuda')
+
+# Move entire dataset to GPU AT CREATION
+X_train_tensor = torch.FloatTensor(X_train).to(device)
+y_train_tensor = torch.LongTensor(y_train).to(device)
+
+dataset = TensorDataset(X_train_tensor, y_train_tensor)
+train_loader = DataLoader(dataset, batch_size=8, shuffle=True)
+
+# Now batches are already on GPU!
+for X_batch, y_batch in train_loader:
+    outputs = model(X_batch)  # GPU! No .to(device) needed
+    ...
+```
+
+### Pattern 3: Check GPU is actually being used
+```python
+import torch
+
+# Before training
+if not torch.cuda.is_available():
+    print("ERROR: GPU not available!")
+    
+print(f"GPU: {torch.cuda.get_device_name(0)}")
+print(f"GPU Memory: {torch.cuda.get_device_properties(0).total_memory / (1024**3):.1f} GB")
+
+# Expected: During training shows GPU memory increasing
+!nvidia-smi  # Should see increasing memory_used
+
+# If GPU memory stays 0, your code isn't using GPU!
+```
+
 ## Summary
 
 | Issue | Fix | Time |
@@ -179,5 +302,13 @@ print(f"RAM used: {process.memory_info().rss / (1024**3):.2f} GB")
 | OOM during training | Reduce batch to 4 | Immediate |
 | Still slow | Skip transformers | Immediate |
 | Need all models | Use Colab Pro | Permanent |
+| GPU shows 0MB | Add `.to(device)` | Code fix |
+
+**Priority:**
+1. ✅ Switched to GPU runtime
+2. ✅ Added `.to('cuda')` to model
+3. ✅ Added `.to(device)` to batch tensors  
+4. ✅ Re-run notebook
+5. ✅ Check `nvidia-smi` for GPU memory usage
 
 Start with **GPU runtime** - it solves 90% of memory issues!
