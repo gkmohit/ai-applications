@@ -66,7 +66,7 @@ BankTransactionClassifier/
 
 ## Quick Start
 
-1. Open [ContractorLens_Training.ipynb](./ContractorLens_Training.ipynb) in Google Colab
+1. Open [CanadianTransactionClassifier-CTC.ipynb](./CanadianTransactionClassifier-CTC.ipynb) in Google Colab
 2. Follow the notebook cells to:
    - Install dependencies
    - Download and preprocess the dataset
