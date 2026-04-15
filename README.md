@@ -14,21 +14,23 @@ The goal of this workspace is to research and experiment with different applicat
 
 ## Projects
 
-### BankTransactionClassifier - ContractorLens
-A comparative research project evaluating machine learning algorithms for cross-platform identification of business vs. personal expenses for Canadian contractors with focus on CRA T2125 tax compliance.
+### BankTransactionClassifier - CanadianTransactionClassifier (CTC)
+A comparative research project evaluating machine learning algorithms for automated classification of business expenses and mapping to Canadian CRA T2125 tax lines.
 
 - **Location**: `./BankTransactionClassifier/`
 - **Main Notebook**: `CanadianTransactionClassifier-CTC.ipynb` (Google Colab)
 - **Technologies**: Logistic Regression, Linear SVM, LightGBM, DistilBERT, MobileBERT
-- **Input Data**: Mitul Shah Transaction Categorization Dataset (Hugging Face)
+- **Input Data**: Mitul Shah Transaction Categorization Dataset (Hugging Face) - Multi-country (requires HF token)
 - **Output Formats**: ONNX (for Next.js/Web), CoreML (for iOS/macOS)
 - **Key Features**:
   - Multi-model comparative analysis (5 different algorithms)
+  - Two-stage classification: Generic Category → CRA T2125 Line
+  - CRA tax deductibility rules and compliance mapping
   - Automated Google Drive integration for results storage
-  - Canadian CRA T2125 category mappings
   - ONNX model export for web deployment
   - Comprehensive performance metrics and visualizations
-- **Description**: Trains and compares 5 ML algorithms to classify bank transactions. Exports the best model to ONNX format for privacy-first browser-side inference, supporting deployment on both web and mobile platforms.
+  - Global transaction support (international business cards)
+- **Description**: Trains and compares 5 ML algorithms to classify bank transactions into both generic categories and CRA T2125 expense lines. Automatically maps deductibility rules. Exports the best model to ONNX format for privacy-first browser-side inference, supporting deployment on both web and mobile platforms.
 
 ### CryptocurrencyAnalysisAndForecasting
 A comprehensive analysis and forecasting system exploring machine learning algorithms for cryptocurrency price prediction and portfolio optimization.
