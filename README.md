@@ -14,6 +14,22 @@ The goal of this workspace is to research and experiment with different applicat
 
 ## Projects
 
+### BankTransactionClassifier - ContractorLens
+A comparative research project evaluating machine learning algorithms for cross-platform identification of business vs. personal expenses for Canadian contractors with focus on CRA T2125 tax compliance.
+
+- **Location**: `./BankTransactionClassifier/`
+- **Main Notebook**: `ContractorLens_Training.ipynb` (Google Colab)
+- **Technologies**: Logistic Regression, Linear SVM, LightGBM, DistilBERT, MobileBERT
+- **Input Data**: Mitul Shah Transaction Categorization Dataset (Hugging Face)
+- **Output Formats**: ONNX (for Next.js/Web), CoreML (for iOS/macOS)
+- **Key Features**:
+  - Multi-model comparative analysis (5 different algorithms)
+  - Automated Google Drive integration for results storage
+  - Canadian CRA T2125 category mappings
+  - ONNX model export for web deployment
+  - Comprehensive performance metrics and visualizations
+- **Description**: Trains and compares 5 ML algorithms to classify bank transactions. Exports the best model to ONNX format for privacy-first browser-side inference, supporting deployment on both web and mobile platforms.
+
 ### CryptocurrencyAnalysisAndForecasting
 A comprehensive analysis and forecasting system exploring machine learning algorithms for cryptocurrency price prediction and portfolio optimization.
 
@@ -35,6 +51,12 @@ Each project within this workspace is self-contained with its own documentation.
 
 ```
 AIApplications/
+├── BankTransactionClassifier/
+│   ├── README.md
+│   ├── ContractorLens_Training.ipynb       # Google Colab notebook
+│   ├── models/                             # Saved models and ONNX exports
+│   ├── results/                            # Performance metrics and summaries
+│   └── comparison_charts/                  # Visualization outputs
 ├── CryptocurrencyAnalysisAndForecasting/
 │   └── Cryptocurrency_Analysis_and_Forecasting.ipynb
 ├── README.md                    # This file
@@ -54,6 +76,6 @@ For questions, suggestions, or collaboration opportunities:
 
 ---
 
-**Last Updated**: December 2025
+**Last Updated**: April 2026
 
 *This is an ongoing research initiative exploring AI applications and methodologies.*
