@@ -18,7 +18,7 @@ The goal of this workspace is to research and experiment with different applicat
 A comparative research project evaluating machine learning algorithms for cross-platform identification of business vs. personal expenses for Canadian contractors with focus on CRA T2125 tax compliance.
 
 - **Location**: `./BankTransactionClassifier/`
-- **Main Notebook**: `ContractorLens_Training.ipynb` (Google Colab)
+- **Main Notebook**: `CanadianTransactionClassifier-CTC.ipynb` (Google Colab)
 - **Technologies**: Logistic Regression, Linear SVM, LightGBM, DistilBERT, MobileBERT
 - **Input Data**: Mitul Shah Transaction Categorization Dataset (Hugging Face)
 - **Output Formats**: ONNX (for Next.js/Web), CoreML (for iOS/macOS)
@@ -53,7 +53,7 @@ Each project within this workspace is self-contained with its own documentation.
 AIApplications/
 ├── BankTransactionClassifier/
 │   ├── README.md
-│   ├── ContractorLens_Training.ipynb       # Google Colab notebook
+│   ├── CanadianTransactionClassifier-CTC.ipynb  # Google Colab notebook
 │   ├── models/                             # Saved models and ONNX exports
 │   ├── results/                            # Performance metrics and summaries
 │   └── comparison_charts/                  # Visualization outputs
